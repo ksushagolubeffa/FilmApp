@@ -1,0 +1,31 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "FilmApp"
+include ':app'
+include ':core'
+include ':feature'
+include ':core:network'
+include ':core:user-database'
+include ':feature:registration'
+include ':feature:profile'
+include ':feature:films'
+include ':feature:favorites'
+include ':core:ui'
+include ':core:favorite-database'
+include ':feature:favorites:api'
+include ':feature:favorites:impl'
+include ':feature:films:impl'
+include ':feature:films:api'
+include ':core:current-user'

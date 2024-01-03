@@ -1,0 +1,82 @@
+plugins {
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.detekt)
+    id 'kotlin-kapt'
+}
+
+android {
+    namespace 'com.example.network'
+    compileSdk = libs.versions.compile.sdk.get().toLong()
+
+    defaultConfig {
+        minSdk = libs.versions.min.sdk.get().toLong()
+        targetSdk = libs.versions.target.sdk.get().toLong()
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    def keystoreProperties = new Properties()
+    keystoreProperties.load(new FileInputStream(rootProject.file("keys.properties")))
+    buildTypes.each {
+        it.buildConfigField 'String', 'API_ENDPOINT', keystoreProperties['baseUrl']
+        it.buildConfigField 'String', 'API_KEY', keystoreProperties['apiKey']
+    }
+    buildFeatures {
+        buildConfig = true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = libs.versions.jvm.target.get()
+    }
+}
+
+dependencies {
+
+    implementation(libs.core.ktx)
+    api(libs.androidx.appcompat)
+    testImplementation(libs.junit)
+
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.test.junit4)
+
+    implementation(libs.koin)
+    implementation(libs.koin.compose)
+
+    api(libs.retrofit.core)
+    api(libs.retrofit.kotlin.serialization)
+    def retrofit = "2.9.0"
+    implementation("com.squareup.retrofit2:converter-gson:$retrofit")
+
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+
+    api(libs.kotlinx.serialization.json)
+}
+
+detekt {
+    source = files(projectDir)
+    config = files("${project.rootDir}/config/detekt/detekt.yml")
+    parallel = true
+    reports {
+        txt.enabled = false
+        xml.enabled = false
+        sarif.enabled = false
+        html {
+            enabled = true
+            destination = file("build/reports/detekt.html")
+        }
+    }
+}

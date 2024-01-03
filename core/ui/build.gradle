@@ -1,0 +1,89 @@
+plugins {
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.detekt)
+
+}
+
+android {
+    namespace 'com.example.ui'
+
+    compileSdk = libs.versions.compile.sdk.get().toLong()
+    defaultConfig {
+        minSdk = libs.versions.min.sdk.get().toLong()
+        targetSdk = libs.versions.target.sdk.get().toLong()
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.compose.kotlin.compiler.get()
+    }
+    kotlinOptions {
+        jvmTarget = libs.versions.jvm.target.get()
+    }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+}
+
+dependencies {
+
+    implementation(libs.core.ktx)
+    api(libs.androidx.appcompat)
+
+    implementation 'androidx.navigation:navigation-runtime-ktx:2.7.6'
+
+    testImplementation(libs.junit)
+
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.test.junit4)
+
+    def composeVersion = "1.4.3"
+
+    implementation(libs.activity.compose)
+    implementation(libs.androidx.compose.material)
+
+    api(libs.activity.compose)
+    api(platform(libs.compose.bom))
+    api(libs.compose)
+    api(libs.compose.graphics)
+    api(libs.compose.tooling.preview)
+    api(libs.material3)
+
+    implementation "androidx.compose.runtime:runtime:$composeVersion"
+    implementation "androidx.compose.compiler:compiler:1.4.8"
+
+    def nav_version = "2.7.5"
+
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+}
+
+detekt {
+    source = files(projectDir)
+    config = files("${project.rootDir}/config/detekt/detekt.yml")
+    parallel = true
+    reports {
+        txt.enabled = false
+        xml.enabled = false
+        sarif.enabled = false
+        html {
+            enabled = true
+            destination = file("build/reports/detekt.html")
+        }
+    }
+}

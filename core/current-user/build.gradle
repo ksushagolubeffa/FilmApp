@@ -1,0 +1,69 @@
+plugins {
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.detekt)
+    id 'kotlin-kapt'
+
+}
+
+android {
+    namespace 'com.example.current_user'
+    compileSdk = libs.versions.compile.sdk.get().toLong()
+
+    defaultConfig {
+        minSdk = libs.versions.min.sdk.get().toLong()
+        targetSdk = libs.versions.target.sdk.get().toLong()
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = libs.versions.jvm.target.get()
+    }
+}
+
+dependencies {
+
+    api(libs.androidx.appcompat)
+
+    implementation(libs.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.compose.material)
+
+    def lifecycle = "2.6.1"
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:${lifecycle}")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:${lifecycle}")
+
+    testImplementation(libs.junit)
+
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.test.junit4)
+}
+
+detekt {
+    source = files(projectDir)
+    config = files("${project.rootDir}/config/detekt/detekt.yml")
+    parallel = true
+    reports {
+        txt.enabled = false
+        xml.enabled = false
+        sarif.enabled = false
+        html {
+            enabled = true
+            destination = file("build/reports/detekt.html")
+        }
+    }
+}
